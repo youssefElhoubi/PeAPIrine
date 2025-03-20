@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id('id');
             $table->unsignedBigInteger('plant_id');
             $table->unsignedBigInteger('client_id');
-            $table->enum('status', ['pending', 'processing','delivered', 'canceled']);
+            $table->enum('status', ['pending', 'processing','delivered', 'canceled'])->default("pending");
             $table->timestamps();
 
             $table->foreign('plant_id')->references('id')->on('palnts')->onDelete('CASCADE');
