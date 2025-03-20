@@ -47,9 +47,8 @@ class OrderController extends Controller
             // Find order by ID
             $order = orders::findOrFail($id);
 
-            // Check if order is already canceled
-            if ($order->status === 'canceled') {
-                return response()->json(['message' => 'Order is already canceled'], Response::HTTP_OK);
+            if ($order->status !== 'pending') {
+                return response()->json(['message' => 'this order can not be canceled'], Response::HTTP_OK);
             }
 
             // Update order status to "canceled"
