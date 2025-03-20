@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\plants;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class plant extends Controller
 {
@@ -53,6 +54,29 @@ class plant extends Controller
 
         } catch (ValidationException $e) {
             return response()->json(['error' => $e->errors()], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+    }
+    public function deletePlant($id)
+    {
+        try {
+            // Find the plant by ID
+            $plant = plants::findOrFail($id);
+
+            // Delete the plant
+            $plant->delete();
+
+            return response()->json([
+                'message' => 'Plant deleted successfully.'
+            ], Response::HTTP_OK);
+
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Plant not found.'
+            ], Response::HTTP_NOT_FOUND);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Something went wrong, please try again.'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }
