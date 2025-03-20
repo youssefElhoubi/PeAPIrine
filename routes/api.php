@@ -12,7 +12,8 @@ Route::middleware(["JWT_validation","isAdmin"])->group(function(){
     Route::post("plant/add",[plant::class,"addPlant"]);
     Route::patch("plant/update/{id}",[plant::class,"updatePlant"]);
     Route::delete("plant/delete/{id}",[plant::class,"deletePlant"]);
-    
+    Route::get("plant/{slug}",[plant::class,"getPlantBySlug"]);
+
     Route::post("category/add", [Catigoie::class, "addCategory"]);
     Route::patch("category/update/{id}", [Catigoie::class, "updateCategory"]);
     Route::delete("category/delete/{id}", [Catigoie::class, "deleteCategory"]);
