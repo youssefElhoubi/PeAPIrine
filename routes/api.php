@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\auth;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::put("auth/singUp",[auth::class,"signUP"]);
+Route::put("auth/singUp",[auth::class,"login"]);
