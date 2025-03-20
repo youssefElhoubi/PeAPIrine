@@ -31,5 +31,28 @@ class plant extends Controller
             return response()->json(['error' => $e->errors()], Response::HTTP_BAD_REQUEST);
         }
     }
-    
+    public function updatePlant(Request $request, $id)
+    {
+        try {
+            $plant = plants::findOrFail($id);
+
+            $validatedData = $request->validate([
+                'name' => 'sometimes|string',
+                'description' => 'sometimes|string',
+                'price' => 'sometimes|numeric',
+                'slug' => 'sometimes|string|unique:plants,slug,' . $id,
+                'category_id' => 'sometimes|exists:categories,id'
+            ]);
+
+            $plant->update($validatedData);
+
+            return response()->json([
+                "message" => "Plant information updated successfully",
+                "updated_plant" => $plant
+            ], Response::HTTP_OK);
+
+        } catch (ValidationException $e) {
+            return response()->json(['error' => $e->errors()], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+    }
 }
