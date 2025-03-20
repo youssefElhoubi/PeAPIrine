@@ -12,7 +12,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->alias([
+            "JWT_validate" => \App\Http\Middleware\Jwt_check::class,
+            "isClient" => \App\Http\Middleware\IsClient::class,
+            "isEmployee" => \App\Http\Middleware\IsEmployee::class,
+            "isAdmine" => \App\Http\Middleware\IsAdmin::class
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
