@@ -63,4 +63,30 @@ class OrderController extends Controller
             return response()->json(['error' => 'Order not found'], Response::HTTP_NOT_FOUND);
         }
     }
+    public function myOrders(Request $request)
+    {
+        try {
+            $userId = $request->user_id;
+            $userOrders = orders::where("client_id", $userId)->get();
+
+            // Check if orders exist
+            if ($userOrders->isEmpty()) {
+                return response()->json([
+                    "message" => "No orders found for this user."
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            // Return orders in JSON format
+            return response()->json([
+                "message" => "Orders retrieved successfully.",
+                "orders" => $userOrders
+            ], Response::HTTP_OK);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                "error" => "Something went wrong. Please try again.",
+                "details" => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }
