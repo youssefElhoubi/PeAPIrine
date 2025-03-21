@@ -24,3 +24,7 @@ Route::middleware(["JWT_validation","isClient"])->group(function(){
     Route::patch("order/cancel/{id}", [OrderController::class, "cancelOrder"]);
     Route::get("order/orders", [OrderController::class, "myOrders"]);
 });
+
+Route::middleware(["JWT_validation"])->group(function(){
+    Route::patch("order/update/{id}",[OrderController::class,"updateStatus"]);
+});
