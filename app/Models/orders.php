@@ -10,6 +10,7 @@ class orders extends Model
     protected $fillable = [
         "plant_id",
         "client_id",
+        "totale",
         "status",
     ];
     public function plants(){

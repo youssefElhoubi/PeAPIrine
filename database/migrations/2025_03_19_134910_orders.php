@@ -12,6 +12,8 @@ return new class extends Migration {
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id('id');
+            $table->decimal('qauntity', 10, 2);
+            $table->decimal('totale', 10, 2);
             $table->unsignedBigInteger('plant_id');
             $table->unsignedBigInteger('client_id');
             $table->enum('status', ['pending', 'processing','delivered', 'canceled'])->default("pending");
@@ -27,6 +29,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists("orders");
     }
 };

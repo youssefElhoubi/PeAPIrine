@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\plants;
 use Illuminate\Http\Request;
 use App\Models\orders;
 use Illuminate\Validation\ValidationException;
@@ -20,12 +21,16 @@ class OrderController extends Controller
             $validatedData = $request->validate([
                 'user_id' => 'required|exists:users,id',
                 'plant_id' => 'required|exists:plants,id',
+                "qauntity" => 'required|number|min:1'
             ]);
+            $plantPrice = plants::find($request->plant_id)->price;
 
             // Create the order
             $order = orders::create([
                 'user_id' => $validatedData['user_id'],
                 'plant_id' => $validatedData['plant_id'],
+                'qauntity' => $validatedData['qauntity'],
+                'totale' => $plantPrice * $validatedData['qauntity']
             ]);
 
             return response()->json([
