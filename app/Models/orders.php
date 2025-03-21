@@ -12,4 +12,10 @@ class orders extends Model
         "client_id",
         "status",
     ];
+    public function plants(){
+        return $this->belongsTo(plants::class,"plant_id");
+    }
+    public function customer(){
+        return $this->belongsTo(client::class,"client_id");
+    }
 }
