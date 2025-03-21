@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\employee;
 use Illuminate\Http\Request;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -9,24 +10,46 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\Response;
 use app\Models\User;
+use app\Models\client;
+use app\Models\admin;
 
 class auth extends Controller
 {
     public function signUP(Request $req)
     {
         try {
-            $validator = $req->validate([
-                'name' => 'required|string|min:4|:max:255',
+            $validatedData = $req->validate([
+                'name' => 'required|string|min:4|max:255',
                 'email' => 'required|email|unique:users',
                 'password' => 'required|string|min:8',
-                "role" => 'required|string|in:client,employee'
+                'role' => 'required|string|in:client,employee'
             ]);
+
             $user = User::create([
-                'name' => $req->name,
-                'email' => $req->email,
-                'password' => Hash::make($req->password)
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+                'password' => Hash::make($validatedData['password']),
+                'role' => $validatedData['role']
             ]);
-            $expirationTime = time() + 3600;
+
+            if ($validatedData['role'] === 'client') {
+                client::create([
+                    'name' => $validatedData['name'],
+                    'email' => $validatedData['email'],
+                    'password' => Hash::make($validatedData['password']),
+                    'role' => $validatedData['role']
+                ]);
+            } elseif ($validatedData['role'] === 'employee') {
+                employee::create([
+                    'name' => $validatedData['name'],
+                    'email' => $validatedData['email'],
+                    'password' => Hash::make($validatedData['password']),
+                    'role' => $validatedData['role']
+                ]);
+            }
+
+            // Generate JWT Token
+            $expirationTime = time() + 3600; // Token expires in 1 hour
             $payload = [
                 'sub' => $user->id,
                 'role' => $user->role,
@@ -34,8 +57,23 @@ class auth extends Controller
                 'exp' => $expirationTime,
             ];
             $token = JWT::encode($payload, env("JWT_SECRET"), "HS256");
+
+            // Return response with user info and token
+            return response()->json([
+                'message' => 'User registered successfully',
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role
+                ],
+                'token' => $token
+            ], Response::HTTP_CREATED);
+
         } catch (ValidationException $e) {
             return response()->json(['error' => $e->errors()], Response::HTTP_BAD_REQUEST);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Something went wrong, please try again'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
     public function login(Request $req)
