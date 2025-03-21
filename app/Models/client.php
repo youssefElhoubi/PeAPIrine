@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use PhpParser\Node\Stmt\Return_;
 
 class client extends Model
 {
@@ -13,4 +14,7 @@ class client extends Model
         'password',
         "role"
     ];
+    public function orders(){
+        return $this->hasMany(orders::class,"client_id");
+    }
 }

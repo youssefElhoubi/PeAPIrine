@@ -89,4 +89,34 @@ class OrderController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    public function updateStatus(Request $request, $id)
+    {
+        try {
+            // Validate the status input
+            $request->validate([
+                'status' => 'required|string|in:pending,processing,shipped,delivered,canceled'
+            ]);
+
+            // Find the order
+            $order = orders::findOrFail($id);
+
+            // Update the status
+            $order->update(['status' => $request->status]);
+
+            return response()->json([
+                "message" => "Order status updated successfully.",
+                "updated_order" => $order
+            ], Response::HTTP_OK);
+
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                "error" => "Order not found."
+            ], Response::HTTP_NOT_FOUND);
+        } catch (\Exception $e) {
+            return response()->json([
+                "error" => "Something went wrong, please try again.",
+                "details" => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

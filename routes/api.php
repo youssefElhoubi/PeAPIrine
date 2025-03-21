@@ -22,4 +22,5 @@ Route::middleware(["JWT_validation","isAdmin"])->group(function(){
 Route::middleware(["JWT_validation","isClient"])->group(function(){
     Route::post("order/create", [OrderController::class, "createOrder"]);
     Route::patch("order/cancel/{id}", [OrderController::class, "cancelOrder"]);
+    Route::get("order/orders", [OrderController::class, "myOrders"]);
 });

@@ -15,7 +15,7 @@ class orders extends Model
     public function plants(){
         return $this->belongsTo(plants::class,"plant_id");
     }
-    public function customer(){
+    public function clients(){
         return $this->belongsTo(client::class,"client_id");
     }
 }
