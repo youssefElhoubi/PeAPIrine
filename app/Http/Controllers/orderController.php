@@ -124,4 +124,19 @@ class OrderController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    public function totalRevenue()
+{
+    try {
+        $total = orders::sum("total"); // Ensure column name is correct
+        return response()->json([
+            "message" => "The total revenue from plants is $total",
+            "total" => $total
+        ], Response::HTTP_OK);
+    } catch (\Throwable $th) {
+        return response()->json([
+            "error" => "Failed to retrieve total revenue",
+            "details" => $th->getMessage() // Include error message for debugging
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+}
 }
