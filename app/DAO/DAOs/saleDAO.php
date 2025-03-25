@@ -13,7 +13,7 @@ class SaleDAO implements SalesInterface{
     public function totaleTales(){
         $total = $this->orders->sum('total');
     }
-    public function popularPlants(){
+    public function totaleTales(){
         $popularPlants = DB::table('orders')
     ->join('plants', 'orders.plant_id', '=', 'plants.id')
     ->select('plants.id', 'plants.name', DB::raw('COUNT(*) as total_orders'))
