@@ -20,24 +20,25 @@ class OrderController extends Controller
             // Validate request data
             $validatedData = $request->validate([
                 'user_id' => 'required|exists:users,id',
-                'plant_id' => 'required|exists:plants,id',
-                "qauntity" => 'required|number|min:1'
+                'plant_id' => 'required|exists:palnts,id',
+                "qauntity" => 'required|numeric|min:1'
             ]);
             $plantPrice = plants::find($request->plant_id)->price;
-
+            
+            // return response()->json([ 'message' => $validatedData], Response::HTTP_CREATED);
             // Create the order
             $order = orders::create([
-                'user_id' => $validatedData['user_id'],
+                'client_id' => $validatedData['user_id'],
                 'plant_id' => $validatedData['plant_id'],
                 'qauntity' => $validatedData['qauntity'],
                 'totale' => $plantPrice * $validatedData['qauntity']
             ]);
-
+            
             return response()->json([
                 'message' => 'Order created successfully',
                 'order' => $order
             ], Response::HTTP_CREATED);
-
+            
         } catch (ValidationException $e) {
             return response()->json(['error' => $e->errors()], Response::HTTP_BAD_REQUEST);
         }

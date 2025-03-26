@@ -9,10 +9,6 @@ class SaleDAO implements SalesInterface{
     public function __construct(orders $orders){
         $this->orders = $orders ;
     }
-
-    public function totaleTales(){
-        $total = $this->orders->sum('total');
-    }
     public function totaleTales(){
         $popularPlants = DB::table('orders')
     ->join('plants', 'orders.plant_id', '=', 'plants.id')
@@ -23,6 +19,7 @@ class SaleDAO implements SalesInterface{
     ->get();
     return $popularPlants;
     }
+    public function popularPlants(){}
     public function salesByCatigory(){
         $topCategory = DB::table('orders')
     ->join('palnts', 'orders.plant_id', '=', 'palnts.id') // Fix table name if needed

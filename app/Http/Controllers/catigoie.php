@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
-use app\Models\categories;
+use App\Models\categories;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class Catigoie extends Controller
 {
-    public function addcategories(Request $request)
+    public function addcategorie(Request $request)
     {
         try {
             $request->validate([
@@ -31,7 +31,7 @@ class Catigoie extends Controller
         }
     }
 
-    public function updatecategories(Request $request, $id)
+    public function updatecategorie(Request $request, $id)
     {
         try {
             $categories = categories::findOrFail($id);

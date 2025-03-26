@@ -15,7 +15,7 @@ class IsEmployee
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!$request->user_role =="employee") {
+        if ($request->user_role !=="employee") {
             return response()->json(["message"=>"you are not AUTHORIZED to this end point"],Response::HTTP_UNAUTHORIZED);
         }
         return $next($request);

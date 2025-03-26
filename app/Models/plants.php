@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class plants extends Model
 {
@@ -14,4 +15,11 @@ class plants extends Model
         'slug',
         'category_id',
     ];
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($plant) {
+            $plant->slug = Str::slug($plant->name) . '-' . Str::random(6);
+        });
+    }
 }

@@ -16,15 +16,13 @@ class plant extends Controller
             $validation = $request->validate([
                 'name' => "required|string",
                 'description' => "required|string",
-                'price' => "required|number",
-                'slug' => 'required|string|unique:plants,slug',
+                'price' => "required|numeric",
                 'category_id' => 'required|exists:categories,id'
             ]);
             plants::create([
                 'name' => $request->name,
                 'description' => $request->description,
                 'price' => $request->price,
-                'slug' => $request->slug,
                 'category_id' => $request->category_id
             ]);
             return response()->json(["message" => "new plat have been added success fuly"], Response::HTTP_CREATED);
@@ -82,7 +80,7 @@ class plant extends Controller
     public function getPlantBySlug($slug)
     {
         try {
-            $plant = plants::where("slug","=",$slug);
+            $plant = plants::where("slug","=",$slug)->first();
             return response()->json([
                 'message' => 'Plant retrieved successfully.',
                 'plant' => $plant

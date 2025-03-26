@@ -9,9 +9,9 @@ use Firebase\JWT\Key;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\Response;
-use app\Models\User;
-use app\Models\client;
-use app\Models\admin;
+use App\Models\User;
+use App\Models\client;
+use App\Models\admin;
 
 class auth extends Controller
 {
@@ -32,22 +32,6 @@ class auth extends Controller
                 'role' => $validatedData['role']
             ]);
 
-            if ($validatedData['role'] === 'client') {
-                client::create([
-                    'name' => $validatedData['name'],
-                    'email' => $validatedData['email'],
-                    'password' => Hash::make($validatedData['password']),
-                    'role' => $validatedData['role']
-                ]);
-            } elseif ($validatedData['role'] === 'employee') {
-                employee::create([
-                    'name' => $validatedData['name'],
-                    'email' => $validatedData['email'],
-                    'password' => Hash::make($validatedData['password']),
-                    'role' => $validatedData['role']
-                ]);
-            }
-
             // Generate JWT Token
             $expirationTime = time() + 3600; // Token expires in 1 hour
             $payload = [
@@ -57,6 +41,7 @@ class auth extends Controller
                 'exp' => $expirationTime,
             ];
             $token = JWT::encode($payload, env("JWT_SECRET"), "HS256");
+            // return response()->json(['token' => $payload], 201);
 
             // Return response with user info and token
             return response()->json([
@@ -72,9 +57,7 @@ class auth extends Controller
 
         } catch (ValidationException $e) {
             return response()->json(['error' => $e->errors()], Response::HTTP_BAD_REQUEST);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Something went wrong, please try again'], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        } 
     }
     public function login(Request $req)
     {

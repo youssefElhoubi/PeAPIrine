@@ -15,7 +15,7 @@ class IsClient
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!$request->user_role =="client") {
+        if ($request->user_role !=="client") {
             return response()->json(["message"=>"you are not AUTHORIZED to this end point"],Response::HTTP_UNAUTHORIZED);
         }
         return $next($request);

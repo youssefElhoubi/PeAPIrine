@@ -11,7 +11,7 @@ class orders extends Model
         "plant_id",
         "client_id",
         "totale",
-        "status",
+        "qauntity"
     ];
     public function plants(){
         return $this->belongsTo(plants::class,"plant_id");
