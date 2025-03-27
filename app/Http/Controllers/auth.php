@@ -89,6 +89,24 @@ class auth extends Controller
             return response()->json(['error' => $e->errors()], Response::HTTP_BAD_REQUEST);
         }
     }
+    /**
+     * @OA\POST(
+     *   tags={"LOGIN"},
+     *   path="/api/auth/signin",
+     *   summary="log in to the user account",
+     *   @OA\RequestBody(
+     *     required={"email","passwored"}
+     *     @OA\Property(property="email",type="string", format="email",example=example@email.com)
+     *     @OA\Parameter(proparty="passwored",type="string",exampl="passwored123"),
+     *     )
+     *     @OA\Response(response=200, description="Successful login",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="token", type="string", example="eyJhbGciOiJIUzI1NiIsInR..." )
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Invalid credentials")
+     * )
+     */
     public function login(Request $req)
     {
         try {
