@@ -15,6 +15,37 @@ use App\Models\admin;
 
 class auth extends Controller
 {
+    /**
+     * @OA\Post(
+     *     path="/api/auth/signup",
+     *     summary="Create a new user account",
+     *     tags={"Authentication"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name", "email", "password", "role"},
+     *             @OA\Property(property="name", type="string", example="John Doe"),
+     *             @OA\Property(property="email", type="string", format="email", example="johndoe@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="password123"),
+     *             @OA\Property(property="role", type="string", enum={"client", "employee"}, example="client")
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="User registered successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="User registered successfully"),
+     *             @OA\Property(property="user", type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="John Doe"),
+     *                 @OA\Property(property="email", type="string", example="johndoe@example.com"),
+     *                 @OA\Property(property="role", type="string", example="client")
+     *             ),
+     *             @OA\Property(property="token", type="string", example="eyJhbGciOiJIUzI1NiIsInR..." )
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Validation error")
+     * )
+     */
+
     public function signUP(Request $req)
     {
         try {
@@ -54,10 +85,9 @@ class auth extends Controller
                 ],
                 'token' => $token
             ], Response::HTTP_CREATED);
-
         } catch (ValidationException $e) {
             return response()->json(['error' => $e->errors()], Response::HTTP_BAD_REQUEST);
-        } 
+        }
     }
     public function login(Request $req)
     {
@@ -67,7 +97,7 @@ class auth extends Controller
                 'password' => 'required|string|min:8',
             ]);
             $user = User::where("email", "=", $req->email)->first();
-            if (!Hash::check($req->password, $user->password, )) {
+            if (!Hash::check($req->password, $user->password,)) {
                 return response()->json(["message" => "something is wrong"], Response::HTTP_BAD_REQUEST);
             }
             $expirationTime = time() + 3600;
