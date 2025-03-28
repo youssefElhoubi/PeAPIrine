@@ -9,6 +9,8 @@ use App\Repository\RepositoryIntarface\SaleRepoInterface;
 use App\Repository\SaleRepo;
 use App\DAO\DAOintretface\UserAuthInterface;
 use App\DAO\DAOs\UserAuthDAO;
+use App\DAO\DAOintretface\Catigoryinterface;
+use App\DAO\DAOs\CatugoryDAO;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,9 +19,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(UserAuthInterface::class,UserAuthDAO::class);
-        $this->app->bind(SalesInterface::class,SaleDAO::class);
-        $this->app->bind(SaleRepoInterface::class,SaleRepo::class);
+        $this->app->bind(Catigoryinterface::class, CatugoryDAO::class);
+        $this->app->bind(UserAuthInterface::class, UserAuthDAO::class);
+        $this->app->bind(SalesInterface::class, SaleDAO::class);
+        $this->app->bind(SaleRepoInterface::class, SaleRepo::class);
     }
 
     /**

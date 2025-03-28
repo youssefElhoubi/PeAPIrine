@@ -7,23 +7,28 @@ use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\categories;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\DAO\DAOintretface\Catigoryinterface;
 
 class Catigoie extends Controller
 {
-    public function addcategorie(Request $request)
+    protected $categoryDAO;
+
+    public function __construct(Catigoryinterface $categoryDAO)
+    {
+        $this->categoryDAO = $categoryDAO;
+    }
+    public function addCategory(Request $request)
     {
         try {
             $request->validate([
                 'name' => 'required|string|unique:categories,name',
             ]);
 
-            $categories = categories::create([
-                'name' => $request->name,
-            ]);
+            $category = $this->categoryDAO->createCategory(['name' => $request->name]);
 
             return response()->json([
-                "message" => "New categories added successfully",
-                "categories" => $categories
+                "message" => "New category added successfully",
+                "category" => $category
             ], Response::HTTP_CREATED);
 
         } catch (ValidationException $e) {
@@ -46,7 +51,6 @@ class Catigoie extends Controller
                 "message" => "categories updated successfully",
                 "updated_categories" => $categories
             ], Response::HTTP_OK);
-
         } catch (ModelNotFoundException $e) {
             return response()->json(['error' => 'categories not found.'], Response::HTTP_NOT_FOUND);
         } catch (ValidationException $e) {
@@ -63,7 +67,6 @@ class Catigoie extends Controller
             return response()->json([
                 'message' => 'categories deleted successfully.'
             ], Response::HTTP_OK);
-
         } catch (ModelNotFoundException $e) {
             return response()->json(['error' => 'categories not found.'], Response::HTTP_NOT_FOUND);
         } catch (\Exception $e) {
