@@ -30,45 +30,41 @@ class Catigoie extends Controller
                 "message" => "New category added successfully",
                 "category" => $category
             ], Response::HTTP_CREATED);
-
         } catch (ValidationException $e) {
             return response()->json(['error' => $e->errors()], Response::HTTP_BAD_REQUEST);
         }
     }
 
-    public function updatecategorie(Request $request, $id)
+    public function updateCategory(Request $request, $id)
     {
         try {
-            $categories = categories::findOrFail($id);
-
             $validatedData = $request->validate([
                 'name' => 'sometimes|string|unique:categories,name,' . $id,
             ]);
 
-            $categories->update($validatedData);
+            $updatedCategory = $this->categoryDAO->updateCategory($id, $validatedData);
 
             return response()->json([
-                "message" => "categories updated successfully",
-                "updated_categories" => $categories
+                "message" => "Category updated successfully",
+                "updated_category" => $updatedCategory
             ], Response::HTTP_OK);
         } catch (ModelNotFoundException $e) {
-            return response()->json(['error' => 'categories not found.'], Response::HTTP_NOT_FOUND);
+            return response()->json(['error' => 'Category not found.'], Response::HTTP_NOT_FOUND);
         } catch (ValidationException $e) {
             return response()->json(['error' => $e->errors()], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
     }
 
-    public function deletecategories($id)
+    public function deleteCategory($id)
     {
         try {
-            $categories = categories::findOrFail($id);
-            $categories->delete();
+            $this->categoryDAO->deleteCategory($id);
 
             return response()->json([
-                'message' => 'categories deleted successfully.'
+                'message' => 'Category deleted successfully.'
             ], Response::HTTP_OK);
         } catch (ModelNotFoundException $e) {
-            return response()->json(['error' => 'categories not found.'], Response::HTTP_NOT_FOUND);
+            return response()->json(['error' => 'Category not found.'], Response::HTTP_NOT_FOUND);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Something went wrong, please try again.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
