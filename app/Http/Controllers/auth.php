@@ -10,11 +10,15 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\User;
-use App\Models\client;
-use App\Models\admin;
+use App\DAO\DAOintretface\UserAuthInterface;
 
 class auth extends Controller
 {
+    protected $userDAO;
+    public function __construct(UserAuthInterface $userDAO)
+    {
+        $this->userDAO = $userDAO;
+    }
     /**
      * @OA\Post(
      *     path="/api/auth/signup",
@@ -56,12 +60,7 @@ class auth extends Controller
                 'role' => 'required|string|in:client,employee'
             ]);
 
-            $user = User::create([
-                'name' => $validatedData['name'],
-                'email' => $validatedData['email'],
-                'password' => Hash::make($validatedData['password']),
-                'role' => $validatedData['role']
-            ]);
+            $user = $this->userDAO->createUser($validatedData);
 
             // Generate JWT Token
             $expirationTime = time() + 3600; // Token expires in 1 hour
