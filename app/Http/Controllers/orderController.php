@@ -8,37 +8,35 @@ use App\Models\orders;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpFoundation\Response;
+use App\DAO\DAOintretface\OrderDAOInterface;
 
 class OrderController extends Controller
 {
+    protected $orderDAO;
+
+    public function __construct(OrderDAOInterface $orderDAO)
+    {
+        $this->orderDAO = $orderDAO;
+    }
     /**
      * Create a new order
      */
     public function createOrder(Request $request)
     {
         try {
-            // Validate request data
             $validatedData = $request->validate([
                 'user_id' => 'required|exists:users,id',
-                'plant_id' => 'required|exists:palnts,id',
-                "qauntity" => 'required|numeric|min:1'
+                'plant_id' => 'required|exists:plants,id',
+                'qauntity' => 'required|numeric|min:1'
             ]);
-            $plantPrice = plants::find($request->plant_id)->price;
-            
-            // return response()->json([ 'message' => $validatedData], Response::HTTP_CREATED);
-            // Create the order
-            $order = orders::create([
-                'client_id' => $validatedData['user_id'],
-                'plant_id' => $validatedData['plant_id'],
-                'qauntity' => $validatedData['qauntity'],
-                'totale' => $plantPrice * $validatedData['qauntity']
-            ]);
-            
+
+            $order = $this->orderDAO->createOrder($validatedData);
+
             return response()->json([
                 'message' => 'Order created successfully',
                 'order' => $order
             ], Response::HTTP_CREATED);
-            
+
         } catch (ValidationException $e) {
             return response()->json(['error' => $e->errors()], Response::HTTP_BAD_REQUEST);
         }
@@ -50,15 +48,7 @@ class OrderController extends Controller
     public function cancelOrder($id)
     {
         try {
-            // Find order by ID
-            $order = orders::findOrFail($id);
-
-            if ($order->status !== 'pending') {
-                return response()->json(['message' => 'this order can not be canceled'], Response::HTTP_OK);
-            }
-
-            // Update order status to "canceled"
-            $order->update(['status' => 'canceled']);
+            $order = $this->orderDAO->cancelOrder($id);
 
             return response()->json([
                 'message' => 'Order has been canceled successfully',
@@ -72,17 +62,12 @@ class OrderController extends Controller
     public function myOrders(Request $request)
     {
         try {
-            $userId = $request->user_id;
-            $userOrders = orders::where("client_id", $userId)->get();
+            $userOrders = $this->orderDAO->getUserOrders($request->user_id);
 
-            // Check if orders exist
             if ($userOrders->isEmpty()) {
-                return response()->json([
-                    "message" => "No orders found for this user."
-                ], Response::HTTP_NOT_FOUND);
+                return response()->json(["message" => "No orders found for this user."], Response::HTTP_NOT_FOUND);
             }
 
-            // Return orders in JSON format
             return response()->json([
                 "message" => "Orders retrieved successfully.",
                 "orders" => $userOrders
@@ -98,26 +83,19 @@ class OrderController extends Controller
     public function updateStatus(Request $request, $id)
     {
         try {
-            // Validate the status input
             $request->validate([
                 'status' => 'required|string|in:pending,processing,shipped,delivered,canceled'
             ]);
 
-            // Find the order
-            $order = orders::findOrFail($id);
-
-            // Update the status
-            $order->update(['status' => $request->status]);
+            $updatedOrder = $this->orderDAO->updateOrderStatus($id, $request->status);
 
             return response()->json([
                 "message" => "Order status updated successfully.",
-                "updated_order" => $order
+                "updated_order" => $updatedOrder
             ], Response::HTTP_OK);
 
         } catch (ModelNotFoundException $e) {
-            return response()->json([
-                "error" => "Order not found."
-            ], Response::HTTP_NOT_FOUND);
+            return response()->json(["error" => "Order not found."], Response::HTTP_NOT_FOUND);
         } catch (\Exception $e) {
             return response()->json([
                 "error" => "Something went wrong, please try again.",
@@ -126,18 +104,18 @@ class OrderController extends Controller
         }
     }
     public function totalRevenue()
-{
-    try {
-        $total = orders::sum("total"); // Ensure column name is correct
-        return response()->json([
-            "message" => "The total revenue from plants is $total",
-            "total" => $total
-        ], Response::HTTP_OK);
-    } catch (\Throwable $th) {
-        return response()->json([
-            "error" => "Failed to retrieve total revenue",
-            "details" => $th->getMessage() // Include error message for debugging
-        ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    {
+        try {
+            $total = $this->orderDAO->getTotalRevenue();
+            return response()->json([
+                "message" => "The total revenue from plants is $total",
+                "total" => $total
+            ], Response::HTTP_OK);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "error" => "Failed to retrieve total revenue",
+                "details" => $th->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
-}
 }

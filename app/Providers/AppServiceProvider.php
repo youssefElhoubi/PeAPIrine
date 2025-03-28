@@ -11,6 +11,8 @@ use App\DAO\DAOintretface\UserAuthInterface;
 use App\DAO\DAOs\UserAuthDAO;
 use App\DAO\DAOintretface\Catigoryinterface;
 use App\DAO\DAOs\CatugoryDAO;
+use App\DAO\DAOintretface\OrderDAOInterface;
+use App\DAO\DAOs\OrderDAO;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->bind(OrderDAOInterface::class, OrderDAO::class);
         $this->app->bind(Catigoryinterface::class, CatugoryDAO::class);
         $this->app->bind(UserAuthInterface::class, UserAuthDAO::class);
         $this->app->bind(SalesInterface::class, SaleDAO::class);
